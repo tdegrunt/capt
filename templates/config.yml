@@ -11,6 +11,7 @@ javascripts:
 stylesheets:
   - 'public/stylesheets/*.css'
   - 'public/stylesheets/*.less'
+  - 'public/stylesheets/*.styl'
 
 specs:
   - 'spec/*/*.coffee'

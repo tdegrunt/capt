@@ -19,6 +19,7 @@
   "dependencies": {
     "coffee-script": "= 1.0.1",
     "less": ">=1.0.41",
+    "stylus": ">=0.1.13",
     "glob": ">=2.0.6",
     "jasmine-node" : ">=1.0.0rc3",
     "eco" : ">=1.0.3"

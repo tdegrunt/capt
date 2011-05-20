@@ -8,6 +8,7 @@ _ = require("#{root}/lib/underscore")
 CoffeeScript  = require 'coffee-script'
 eco = require "eco"
 LessParser = require('less').Parser
+stylus = require "stylus"
 
 sys.puts "Capt:"
 sys.puts " * Using coffeescript version #{CoffeeScript.VERSION}"
@@ -56,12 +57,17 @@ class Project
       "<script src='#{path}' type='text/javascript'></script>"
       
   getStyleTagFor: (path) ->
-    if Path.extname(path) == '.less'
-      # LESS CSS compiler
-      csspath = Path.join(Path.dirname(path), "." + Path.basename(path, '.less') + '.css')
-      "<link href='#{csspath}' media='screen' rel='stylesheet' type='text/css' />"
-    else
-      "<link href='#{path}' media='screen' rel='stylesheet' type='text/css' />"
+    switch Path.extname(path) 
+      when '.less'
+        # LESS CSS compiler
+        csspath = Path.join(Path.dirname(path), "." + Path.basename(path, '.less') + '.css')
+        "<link href='#{csspath}' media='screen' rel='stylesheet' type='text/css' />"
+      when '.styl'
+        # Stylus CSS compiler
+        csspath = Path.join(Path.dirname(path), "." + Path.basename(path, '.styl') + '.css')
+        "<link href='#{csspath}' media='screen' rel='stylesheet' type='text/css' />"
+      else
+        "<link href='#{path}' media='screen' rel='stylesheet' type='text/css' />"
 
   bundleStylesheet : (filename) ->
     index = 0
@@ -70,6 +76,9 @@ class Project
       index++
       if script.match /less$/
         exec("lessc #{@root}#{script} > /tmp/#{index}.css")
+        "\"/tmp/#{index}.css\""
+      else if script.match /styl$/
+        exec("stylus < #{@root}#{script} > /tmp/#{index}.css")
         "\"/tmp/#{index}.css\""
       else
         "\"#{@root}#{script}\""
@@ -193,6 +202,8 @@ class Project
       @_compileCoffee(file)
     else if extension == ".less"
       @_compileLess(file)
+    else if extension == ".styl"
+      @_compileStylus(file)
     else if extension == ".xml"
       @_compileXml(file)
     else if extension == ".eco"
@@ -237,7 +248,28 @@ class Project
         else
           sys.puts " * Compiled " + outpath
           fs.writeFileSync Path.join(@root, outpath), css.toCSS()
+
+  _compileStylus : (file) ->
     
+    fs.readFile Path.join(@root, file), (err, code) =>
+      throw err if err
+
+      path = Path.dirname(file)
+      outpath = Path.join(path, "." + Path.basename(file, ".styl") + ".css")
+    
+      try
+        fs.mkdirSync Path.join(@root, path), 0755
+      catch e
+        # .. ok ..
+      
+      stylus(code.toString()).set('filename', 'nesting.css').render (e, css) =>
+        if e
+          sys.puts " * Error compiling #{file}"
+          sys.puts err.message
+        else
+          sys.puts " * Compiled " + outpath
+          fs.writeFileSync Path.join(@root, outpath), css
+
   # Compile xml fixtures
   _compileXml : (file) ->
     fs.readFile Path.join(@root, file), "utf-8", (err, code) =>
