@@ -34,6 +34,7 @@ Usage:
 
   Code generators:
     * capt generate model post
+    * capt generate collection posts
     * capt generate controller posts
     * capt generate view posts show
     
@@ -130,7 +131,7 @@ task 'new', 'create a new project', (arguments) ->
 
   sys.puts " * Creating folders"
 
-  dirs = ["", "spec", "spec/jasmine", "spec/models", "spec/controllers", "spec/views", "app", "app/views", "app/views/jst", "app/controllers", "app/models", "lib", "public", "public/stylesheets", "spec/fixtures"]
+  dirs = ["", "spec", "spec/jasmine", "spec/models", "spec/collections", "spec/controllers", "spec/views", "app", "app/views", "app/views/jst", "app/controllers", "app/models", "app/collections", "lib", "public", "public/stylesheets", "spec/fixtures"]
 
   for dir in dirs
     fs.mkdirSync "#{project}/#{dir}", 0755
@@ -191,15 +192,15 @@ task 'generate collection', 'create a new collection', (arguments) ->
   if arguments[0]
     model = arguments[0].toLowerCase()
   else
-    raise("Must supply a name for the model")
+    raise("Must supply a name for the collection")
 
   copyFile = (from, to) ->
     ejs = fs.readFileSync(from) + ""
     fs.writeFileSync(Path.join(project.root, to), _.template(ejs, { project : project, model : model }))
     sys.puts " * Created #{to}"
 
-  copyFile "#{root}/templates/collection/collection.coffee", "app/models/#{model}_collection.#{project.language()}"
-  copyFile "#{root}/templates/collection/spec.coffee", "spec/models/#{model}_collection.#{project.language()}"
+  copyFile "#{root}/templates/collection/collection.coffee", "app/collections/#{model}_collection.#{project.language()}"
+  copyFile "#{root}/templates/collection/spec.coffee", "spec/collections/#{model}_collection.#{project.language()}"
 
 
 task 'generate controller', 'create a new controller', (arguments) ->

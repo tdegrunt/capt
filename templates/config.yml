@@ -6,6 +6,7 @@ javascripts:
   - 'app/controllers/*.coffee'
   - 'app/views/**/*.coffee'
   - 'app/models/*.coffee'
+  - 'app/collections/*.coffee'
 
 stylesheets:
   - 'public/stylesheets/*.css'
